@@ -207,11 +207,16 @@ ul.menu li{
     color: #fff;
     padding: 0 20px;
 }
+#block-nice-menus-1 li a:hover{
+	color: #ffcc66;
+}
 #block-nice-menus-1 li.over>a {
-    color: #ffcc66;
+    color: #fba700;
     background: #471406;
     opacity: 0.6;
     filter: alpha(opacity='60');
+	text-shadow: #000 2px 2px 2px;
+	filter: progid:DXImageTransform.Microsoft.Shadow(color=#0000FF,direction=45);
 }
 #block-nice-menus-1 .menuparent ul{
     width: 100%;
@@ -234,9 +239,13 @@ ul.menu li{
     font: 13px/32px Verdana;
     color: #fff;
 }
+#block-nice-menus-1 .menuparent ul li a:before{
+    content: "•";
+	padding-right: 10px;
+}
 #block-nice-menus-1 .menuparent ul li a:hover{
-    color: #ffcc66;
     background: #31150d;
+	color: #ffcc66;
 }
 
 
