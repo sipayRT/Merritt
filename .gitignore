@@ -6,3 +6,4 @@ sites/*/files
 sites/*/private
 __dbg
 acro.clpprj
+.htaccess
