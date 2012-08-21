@@ -1,0 +1,6 @@
+name = Custom Site Settings
+description = Customized Settings to enable functionality for certain pages.
+core = 7.x
+version = "7.x-1.0"
+package = Acro Media Inc.
+

@@ -1,0 +1,29 @@
+; BASIC SETTINGS
+name = Merritt
+description = Custom Theme By Acro Media Inc.
+version = 2.0
+core = 7.x
+
+; ADDITIONAL SETTINGS
+settings[shortcut_module_link] = 0
+
+; REGIONS
+regions[content] = Content
+regions[header_menu] = Header Menu
+regions[fixed_menu] = Fixed Menu
+regions[main_content_menu] = Main Content Menu
+regions[search_form] = Footer - Search
+regions[newsletter_signup_form] = Footer - Newsletter Signup Form
+regions[sub_ctas] = Sub CTAs
+regions[product_cta] = Product CTA
+regions[footer_text] = Footer Text
+
+; CSS
+stylesheets[all][] = css/style.css
+
+; JS
+scripts[] = js/modernizr.js
+scripts[] = js/selectivizr-min.js
+scripts[] = js/plugins.js
+scripts[] = js/script.js
+

@@ -1,0 +1,83 @@
+<?php
+
+/**
+ * Implements hook_preprocess_page().
+ */
+function frameworkd7_preprocess_page(&$vars) {
+
+  global $language;
+
+  if (isset($vars['node']->type)) {
+
+    // Boost template suggestions to look for templates based on path as well
+    // Get the url_alias and make each item part of an array
+    $url_alias = drupal_get_path_alias($_GET['q']);
+    $split_url = explode('/', $url_alias);
+
+    // Add the full path template pages
+    // Insert 2nd to last to allow page--node--[nid] to be last
+    $cumulative_path = '';
+    foreach ($split_url as $path) {
+      $cumulative_path .= '__' . $path;
+      $path_name = 'page' . $cumulative_path;
+      array_splice($vars['theme_hook_suggestions'], -1, 0, str_replace('-','_',$path_name));
+    }
+
+    // This does just the page name on its own & is considered more specific than the longest path
+    // (because sometimes those get too long)
+    // Also we don't want to do this if there were no paths on the URL
+    // Again, add 2nd to last to preserve page--node--[nid] if we do add it in
+    if (count($split_url) > 1) {
+      $page_name = end($split_url);
+      array_splice($vars['theme_hook_suggestions'], -1, 0, 'page__' . str_replace('-','_',$page_name));
+    }
+
+    // We don't want to apply this on taxonomy or view pages
+    // Splice (2) is based on existing default suggestions. Change it if you need to.
+    array_splice($vars['theme_hook_suggestions'], -1, 0, 'page__node__' . $vars['node']->type);
+  }
+
+  // Add ability to make templates for taxonomy vocabulary types
+  if(arg(0) == 'taxonomy' && arg(1) == 'term') {
+    $tid = (int)arg(2);
+    $term = taxonomy_term_load($tid);
+    if(is_object($term)) {
+      array_splice($vars['theme_hook_suggestions'], -1, 0, 'page__taxonomy__'.$term->vocabulary_machine_name);
+    }
+  }
+
+  // add menus to the template variables
+  $vars['primary_navigation'] = menu_enhancement_get_menu('primary_navigation', $language);
+  $vars['secondary_navigation'] = menu_enhancement_get_menu('secondary_navigation', $language);
+  $vars['footer_navigation'] = menu_enhancement_get_menu('footer_navigation', $language);
+  $vars['social_media_navigation'] = menu_enhancement_get_menu('social_media_navigation', $language);
+
+  $vars['root_menu_item'] = _acro_get_root_menu_item();
+
+  // Check for sec nav and add class
+  if(!empty($vars['secondary_navigation'])) {
+    $vars['$page_layout_css'] = 'page_with_sec_nav';
+  }
+}
+
+/**
+ * Helper Functions
+ */
+
+/**
+ * Get the root active menu item.
+ */
+function _acro_get_root_menu_item($depth = 1, $lang = 'en') {
+
+  $active_trail = menu_get_active_trail();
+  $menu_item = array();
+
+  if (!isset($active_trail[$depth]['link_title'])) {
+    return NULL;
+  }
+
+  $menu_item['title'] = $active_trail[$depth]['link_title'];
+  $menu_item['path'] = drupal_get_path_alias($active_trail[1]['link_path'], $lang);
+
+  return $menu_item;
+}

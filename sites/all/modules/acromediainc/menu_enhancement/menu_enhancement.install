@@ -1,0 +1,49 @@
+<?php
+// $Id$
+
+/**
+ * @file
+ * Menu enhancement install information.
+ * 
+ * Provides implementations of hook_schema and hook_uninstall.
+ */
+
+/**
+ * Implements hook_schema().
+ */
+function menu_enhancement_schema() {
+  $schema['menu_enhancement_custom_menu'] = array(
+    'description' => 'The base table for menu enhancement custom menus.',
+    'fields' => array(
+      'mid' => array(
+        'description' => 'The Drupal menu that this custom menu pulls its links from.',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'name' => array(
+        'description' => 'The name of this custom menu, in plain text.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'settings' => array(
+        'description' => 'The settings for this custom menu.',
+        'type' => 'text',
+      ),      
+    ),
+    'primary key' => array('name'),
+  );
+  
+  return $schema;
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function menu_enhancement_uninstall() {
+  // Drop my tables.
+  drupal_uninstall_schema('menu_enhancement');
+}

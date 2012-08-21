@@ -1,0 +1,16 @@
+<?php
+function taxonomy_views_switcher_install() {
+  // Taxonomy views switcher should run after Views,
+  // so that TVS hook_menu_alter will override 'taxonomy/term/%' view
+  $views_weight = db_select('system')
+    ->fields('system', array('weight'))
+    ->condition('name', 'views')
+    ->execute()
+    ->fetchField();
+
+  db_update('system')
+    ->fields(array('weight' => $views_weight+1))
+    ->condition('name', 'taxonomy_views_switcher')
+    ->execute();
+}
+?>

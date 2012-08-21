@@ -1,0 +1,7 @@
+name = Menu Enhancement
+description = Adds additional functionality to the menu system and adds a new theme
+dependencies[] = node
+dependencies[] = menu
+package = Acro Media Inc.
+core = 7.x
+version = "7.x-1.0"

@@ -1,0 +1,276 @@
+<?php
+// $Id$
+
+/**
+ * Implementation of hook_theme(). Register theming functions.
+ */
+function menu_enhancement_theme($existing, $type, $theme, $path) {
+  return array(
+    'menu_links_enhanced' => array(
+      'variables' => array(
+        'tree' => array(),
+        'attributes' => array(), 
+      ),
+      'file' => 'includes/menu_enhancement.pages.inc',
+    ),
+    'menu_tree_enhanced' => array(
+      'variables' => array(
+        'tree_output' => NULL,
+        'class' => NULL,
+        'attributes' => array(
+          'id' => NULL,
+        ),
+      ),
+      'function' => 'menu_enhancement_theme_menu_tree',
+      'file' => 'includes/menu_enhancement.pages.inc',
+    ),  
+    'menu_item_enhanced' => array(
+      'variables' => array(
+        'link' => NULL,
+        'has_children' => 0,
+        'menu' => '',
+        'in_active_trail' => FALSE,
+        'extra_class' => NULL,
+        'attributes' => NULL,
+        'last' => '',
+      ),
+      'function' => 'theme_menu_enhancement_item',
+      'file' => 'includes/menu_enhancement.pages.inc',
+    ),  
+    'menu_item_enhanced_link' => array(
+      'variables' => array('class' => NULL),
+      'function' => 'theme_menu_enhancement_link',
+      'file' => 'includes/menu_enhancement.pages.inc',
+    ),
+  );
+}
+
+function menu_enhancement_get_defaults() {
+  $attributes = array(
+    'show-parents' => FALSE,
+    'show-children' => FALSE,
+    'level' => 0,
+    'id' => '',
+    'class' => '',
+    'item-class-prefix' => '',
+    'separator' => '',
+  );
+  return $attributes;
+}
+
+/**
+ * Implements hook_help().
+ */
+function menu_enhancement_help($path, $arg) {
+    module_load_include('inc', 'menu_enhancement', 'includes/menu_enhancement.pages');
+    return module_invoke('menu_enhancement', 'help_delegate', $path, $arg);
+}
+
+/**
+ * Implements hook_permission().
+ */
+function menu_enhancement_permission() {
+  $permissions = array(
+    'administer menu enhancement' => array(
+      'title' => t('Administer Menu Enhancement'),  
+    ),  
+  );
+  return $permissions;
+}
+
+/**
+ * Implements hook_menu().
+ */
+function menu_enhancement_menu() {
+  $items['admin/config/user-interface/menu_enhancement'] = array(
+    'title' => 'Menu Enhancement',
+    'description' => 'Build customized navigation menus.',
+    'page callback' => 'menu_enhancement_admin_main',    
+    'access arguments' => array('administer menu enhancement'),
+    'file' => 'includes/menu_enhancement.admin.inc',
+  );
+  $items['admin/config/user-interface/menu_enhancement/add'] = array(
+    'title' => 'Menu Enhancement',
+    'description' => 'Add a new customized menu.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('menu_enhancement_admin_menu_form'),    
+    'access arguments' => array('administer menu enhancement'),
+    'file' => 'includes/menu_enhancement.admin.inc',
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+  );
+  $items['admin/config/user-interface/menu_enhancement/edit/%menu_enhancement_custom_menu'] = array(
+    'title' => 'Menu Enhancement',
+    'description' => 'Add a new customized menu.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('menu_enhancement_admin_menu_form', 5),
+    'access arguments' => array('administer menu enhancement'),
+    'file' => 'includes/menu_enhancement.admin.inc',
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+  );
+  $items['admin/config/user-interface/menu_enhancement/delete/%menu_enhancement_custom_menu'] = array(
+    'title' => 'Menu Enhancement',
+    'description' => 'Delete a customized menu.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('menu_enhancement_admin_delete_form', 5),    
+    'access arguments' => array('administer menu enhancement'),
+    'file' => 'includes/menu_enhancement.admin.inc',
+    'type' => MENU_VISIBLE_IN_BREADCRUMB,
+  );
+  
+  return $items;
+}
+
+/*
+ * If the menu item is a vocabulary term, check that the term being loaded is a child
+ * if it is, return TRUE
+ */
+function _menu_enhancement_catalog_check_term_active($menu_item, &$term) {
+  //check if this is the parent of it is has children
+  $parents = taxonomy_get_parents($term->tid);
+  if (count($parents) > 0) {
+    $parent = array_shift($parents);
+    if ($parent) {
+      if ($menu_item['link_title'] == $parent->name) {
+        return TRUE;
+      }
+    }
+  }
+  else{    
+    if ($menu_item['link_title'] == $term->name) {
+      return TRUE;
+    }
+  }
+  return FALSE;
+}
+
+/*
+ * If the menu item is a vocabulary term, check that the node being loaded is within the correct term
+ * if it is, return TRUE
+ */
+function _menu_enhancement_catalog_check_node_active($menu_item, &$node) {
+  $terms = taxonomy_node_get_terms($node);
+  if (count($terms) > 0) {
+    $term = array_shift($terms);      
+    $parents = taxonomy_get_parents($term->tid);
+    if (count($parents)) {
+      $parent = array_shift($parents);
+      if ($menu_item['link_title'] == $parent->name) {
+        return TRUE;
+      }
+    }
+  }
+  
+  return FALSE;    
+}
+
+//returns an array with 'four corners' and 'span' not included in it
+function menu_enhancement_remove_attributes($attributes = NULL, $menu_item_class, $parent = FALSE) {
+  $attributes_array = array();
+  
+  if ($parent) {
+    $check_attributes = $attributes['parent_attributes'];
+  } 
+  else {
+    $check_attributes = $attributes['child_attributes'];
+  }
+    
+  foreach ($check_attributes AS $name => $value) {
+      if ($name != 'four_corners' && $name != 'span') {
+        $attributes_array[$name] = $value;            
+      }
+    }
+  
+    $attributes_array = array_merge($menu_item_class, $attributes_array);
+     
+  return $attributes_array;
+}
+
+/* Gets the menu link for the path provided
+ *
+ */
+function menu_enhancement_menu_link($menu_name = NULL, $path) {
+  $item = NULL;
+
+  // Give priority to the default menu
+  if (isset($menu_name)) {
+    $mlid = db_result(db_query_range("SELECT mlid FROM {menu_links} WHERE link_path = '%s' AND menu_name = '%s' AND module = 'menu' ORDER BY mlid ASC", $path, $menu_name, 0, 1));
+  }
+  // Check all menus if a link does not exist in the default menu.
+  if (!$mlid) {
+    $mlid = db_result(db_query_range("SELECT mlid FROM {menu_links} WHERE link_path = '%s' AND module = 'menu' ORDER BY mlid ASC", $path, 0, 1));
+  }
+  if ($mlid) {
+    $item = menu_link_load($mlid);
+  }
+
+  return $item;
+}
+
+/**
+ * Load all custom menus, or just one if the name is given
+ * 
+ * @param $name 
+ *   The name of a single custom menu.
+ * @param $clear 
+ *   If TRUE, will get the custom menus from the database again, even if they have previously been retrieved.
+ * @return 
+ *   An array of containing all custom menus, or just one one specified by $name. If $name could not be found, will return FALSE.
+ */
+function menu_enhancement_custom_menu_load($name = '', $clear = FALSE) {  
+  static $menus;
+  
+  if (empty($menus) || $clear === TRUE) {    
+    $result = db_select('menu_enhancement_custom_menu', 's')->fields('s')->execute();
+    
+    foreach ($result as $data) {
+      $data->settings = unserialize($data->settings);
+      $menus[$data->name] = $data;
+    }
+  }
+
+  if (!empty($name)) {
+    if (isset($menus[urldecode($name)])) {
+      return $menus[urldecode($name)];
+    }
+    else {
+      return FALSE;
+    }
+  }
+  else {
+    return $menus;
+  }
+}
+
+function menu_enhancement_get_menu($name) {
+  $menu = menu_enhancement_custom_menu_load($name);  
+  $link_data = menu_tree_page_data($menu->settings['use_menu']);
+  
+  if ($menu) {
+    $output = theme('menu_links_enhanced', array(
+      'tree' => $link_data,
+      'attributes' => array(
+        'list_attributes' => array(
+          'level' => $menu->settings['start_depth'],
+          'show-parents' => $menu->settings['show_parents'],
+          'show-children' => $menu->settings['show_children'],
+          'id' => $menu->settings['list_id'],
+          'class' => $menu->settings['list_class'],
+          'item-class-prefix' => $menu->settings['item_class_prefix'],          
+          'separator' => $menu->settings['separator'],
+        ),
+        'parent_attributes' => array(
+          'class' => $menu->settings['parent_class'],
+          'four_corners' => $menu->settings['parent_four_corners'],
+          'span' => $menu->settings['parent_span'],
+        ),
+        'child_attributes' => array(
+          'class' => $menu->settings['child_class'],
+          'four_corners' => $menu->settings['child_four_corners'],
+          'span' => $menu->settings['child_span'],
+        ),
+      ),
+    ));
+  }
+  
+  return (!empty($output)) ? $output : FALSE;
+}

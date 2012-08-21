@@ -1,0 +1,129 @@
+<?php
+
+function taxonomy_views_switcher_menu_alter(&$items) {
+  $items['taxonomy/term/%']['page callback']    = 'taxonomy_views_switcher_render_view';
+  $items['taxonomy/term/%']['page arguments']   = array(2);
+  $items['taxonomy/term/%']['access callback']  = 'taxonomy_views_switcher_view_access';
+  $items['taxonomy/term/%']['access arguments'] = array(2);
+}
+
+function taxonomy_views_switcher_render_view($tid = '', $depth = 0, $op = 'page'){
+
+  $target = taxonomy_views_switcher_get_view();
+  if (isset($target['view'])) {
+  	$view = views_get_view($target['view']);
+    $view->set_display($target['display']);
+    $view->set_arguments(array($tid, $depth));
+    $view->build();
+    drupal_set_title(str_replace('&amp;','&',$view->get_title()));
+    return $view->preview();
+  }
+
+  // if no suitable view is found, use core drupal taxonomy/term/% page
+  module_load_include('inc', 'taxonomy', 'taxonomy.pages');
+  return taxonomy_term_page(taxonomy_term_load($tid));
+}
+
+function taxonomy_views_switcher_view_access($term){
+  //TODO: add access control if necessary
+  return true;
+}
+
+
+function taxonomy_views_switcher_get_view(){
+  $view_path = request_path(); //use the request path, not the aliased path and escape the forward slashes
+
+
+  if ($cached = cache_get("taxonomy_views_switcher:$view_path")) {
+    return $cached->data;
+  }   
+  
+  $target_view = array(); // default target view;
+  $default_view = array(); // default view if no suitable target found
+
+  $views = views_get_all_views();
+  foreach ($views as $view) {
+    if (isset($view->disabled) && $view->disabled) continue;
+
+    foreach ($view->display as $name => $display) 
+    {
+      // Each view can have multiple displays. These may have a path specified.
+      $plugin = $display->display_plugin;
+
+      // It has a path or it is not eligable.
+      if (!in_array($plugin, array('block', 'feed', 'default'))) {
+        if (!isset($display->display_options['path'])) continue;
+
+        $path = $display->display_options['path']; // this display might be suitable
+        if (!(strpos($path,'switch/') == 0)) continue; // path must start with "switch/" otherwise display is of no use
+        $path = preg_replace('/^(switch)?\//','',$path);
+        $path = preg_replace('/(\/\%)?$/','',$path);
+
+        // Set default view - check if default taxonomy/term view is found
+        if ($path == 'taxonomy/term') {
+          $default_view = array(
+            'view'    => $view->name,
+            'display' => $name,
+            'path' => $path
+          );
+        }
+
+        // Set target view - match the view to the current request_path
+        if (preg_match('/'.str_replace('/','\/',$path).'/', $view_path)) {
+          // this path matches, now we want to see if it's a more specific (ie deeper) path than any existing ones)
+          if (!isset($target_view['view']) || substr_count($path,'/') > substr_count($target_view['path'],'/')) {
+            if (empty($target_view['match_priority']) || $target_view['match_priority'] <= 1){
+              $target_view = array(
+                'view'    => $view->name,
+                'display' => $name,
+                'path' => $path,
+                'match_priority' => '1'
+              );
+            }
+          }
+        } 
+        // see if there is a path matching taxonomy vid/machine_name
+        elseif (substr($path,0,4) == 'vid/') {
+          $term = taxonomy_term_load(arg(2));
+          // match vid or vocabulary machine name
+          if ($path == 'vid/'.$term->vid || $path == 'vid/'.$term->vocabulary_machine_name) {
+            if (empty($target_view['match_priority']) || $target_view['match_priority'] <= 2){
+              $target_view = array(
+                'view'    => $view->name,
+                'display' => $name,
+                'path' => $path,
+                'match_priority' => '2'
+              );
+            }
+          }        
+        }
+        // see if there is a path matching taxonomy tid/term name
+        elseif (substr($path,0,4) == 'tid/') {
+          $term = taxonomy_term_load(arg(2));
+          // match tid or taxonomy term name
+          if ($path == 'tid/'.$term->tid || $path == 'tid/'.$term->name) {
+            if (empty($target_view['match_priority']) || $target_view['match_priority'] <= 3){
+              $target_view = array(
+                'view'    => $view->name,
+                'display' => $name,
+                'path' => $path,
+                'match_priority' => '3'
+              );
+            }
+            break; // for now, a term match is totally specific, so end matching process 
+          }        
+        }
+      }
+    }
+  }
+  if (isset($target_view['view']))
+  {
+    cache_set("taxonomy_views_switcher:$view_path",$target_view);
+    return $target_view;
+  } else {
+    cache_set("taxonomy_views_switcher:$view_path",$default_view);
+    return $default_view;
+  }
+}
+
+

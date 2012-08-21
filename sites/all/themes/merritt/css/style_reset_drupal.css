@@ -1,0 +1,97 @@
+/*******************************************
+* > Reset Drupal System
+*******************************************/
+
+#site-container ul li.collapsed { list-style-image: none; list-style-type: none; }
+  #site-container li.collapsed,
+  #site-container li.expanded,
+  #site-container li.leaf,
+  #site-footer li.collapsed,
+  #site-footer li.expanded,
+  #site-footer li.leaf
+  { margin: 0; padding: 0; list-style: none; list-style-type: none; list-style-image: none; }
+
+html .form-item,
+html .form-actions
+{ margin: 8px 0; padding: 0; }
+
+.element-invisible { display: none; }
+
+div.panels-display ul li { background: none !important; padding: 0 !important; }
+
+html body.admin-menu { margin-top: 51px !important; }
+
+p.search-info { display: none; }
+
+.calendar-calendar .month-view .full td.multi-day div.monthview, .calendar-calendar .week-view .full td.multi-day div.weekview, .calendar-calendar .day-view .full td.multi-day div.dayview { background-color: #333; }
+.calendar-calendar .month-view .full td.multi-day .inner .monthview .continues, .calendar-calendar .month-view .full td.multi-day .inner .monthview .cutoff, .calendar-calendar .week-view .full td.multi-day .inner .weekview .continues, .calendar-calendar .week-view .full td.multi-day .inner .weekview .cutoff { background-color: #333; }
+.view .date-nav-wrapper .date-prev a, .view .date-nav-wrapper .date-next a { color: #666; }
+  .view .date-nav-wrapper .date-prev a:hover, .view .date-nav-wrapper .date-next a:hover { color: #09f; }
+.view .date-nav-wrapper .date-heading { text-align: left; }
+
+#site-map h2.title { display: none; }
+
+.webform-client-form .form-submit {
+  margin: 0;
+  padding: 0;
+  display: block;
+  width: 72px;
+  height: 24px;
+  line-height: 48px;
+  background: url(../gfx/b_submit_sm.png) 0 0 no-repeat;
+  text-decoration: none;
+  text-indent: -9999px;
+  border: 0;
+  float: left;
+  }
+  .webform-client-form .form-submit:hover { background-position: 0 -24px; }
+
+#search-form .form-submit {
+  margin: 0;
+  padding: 0;
+  display: block;
+  width: 72px;
+  height: 24px;
+  line-height: 48px;
+  background: url(../gfx/b_search_sm.png) 0 0 no-repeat;
+  text-decoration: none;
+  text-indent: -9999px;
+  border: 0;
+  }
+  #search-form .form-submit:hover { background-position: 0 -24px; }
+
+/*******************************************
+* > Admin Tabs
+*******************************************/
+
+div.tabs {
+  margin: 0;
+  padding: 0;
+  }
+  div.tabs ul.primary {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    }
+    div.tabs ul.primary li {
+      display: block;
+      float: left;
+      margin: 0;
+      padding: 0 0 10px 0;
+      }
+      div.tabs ul.primary li a {
+        margin: 0 3px 0px 0;
+        padding: 3px 10px;
+        border-radius: 6px 6px 6px 6px;
+        display: block;
+        float: left;
+        border: 0;
+        background: transparent url(../gfx/bkg_tab.png) 0 0;
+        font-size: 12px;
+        color: #d5d5d5;
+        }
+        div.tabs ul.primary li a:hover { color: #fff; }
+        div.tabs ul.primary li a.active {
+          color: #fff;
+          font-weight: bold;
+          }
