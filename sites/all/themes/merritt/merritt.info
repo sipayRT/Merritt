@@ -8,15 +8,16 @@ core = 7.x
 settings[shortcut_module_link] = 0
 
 ; REGIONS
+regions[header_widgets] = Header Widgets
 regions[content] = Content
+regions[sidebar] = Sidebar
 regions[header_menu] = Header Menu
 regions[fixed_menu] = Fixed Menu
 regions[main_content_menu] = Main Content Menu
-regions[search_form] = Footer - Search
-regions[newsletter_signup_form] = Footer - Newsletter Signup Form
 regions[sub_ctas] = Sub CTAs
 regions[product_cta] = Product CTA
 regions[footer_text] = Footer Text
+regions[footer_3_blocks] = Footer 3 Blocks
 
 ; CSS
 stylesheets[all][] = css/style.css

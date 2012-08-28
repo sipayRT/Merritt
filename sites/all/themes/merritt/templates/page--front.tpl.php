@@ -77,45 +77,48 @@ drupal_add_js($directory . '/js/jquery.nivo.slider.pack.js', 'file');
     <!-- site wrapper -->
     <div id="site-wrapper">
 
-      <!-- site container -->
-      <div id="site-container">
+		<!-- site container -->
+		<div id="site-container">
+			<!-- site content wrapper -->
+			<div id="site-content-wrapper">
+			
+				<!-- site content -->
+				<div id="site-content">
+				  <div id="col-left">
+				    <div class="add-pad">
+						<?php if ($title){ ?><h1 class="title" id="page-title"><?php print $title; ?></h1><?php } ?>
+						<?php if ($tabs['#primary']){ ?><div class="tabs"><?php print render($tabs); ?></div><br class="clear-both" /><?php } ?>
+						<?php print $messages; ?>
+						<?php if ($action_links){ ?><ul class="action-links"><?php print render($action_links); ?></ul><?php } ?>
+						<div id="user-content">
+							<?php print render($page['content']); ?>
+						</div>
+					</div>
+				  </div>
+				  <div id="col-right">
+				    <div class="add-pad">
+						<section id="sidebar">
+				        	<?php if ($page['sidebar']): ?>
+				                <?php print render($page['sidebar']); ?>
+				    		<?php endif; ?>
+				      	</section>
+				    </div>
+				  </div>
+				  <div class="clear-both"></div>
+				</div>																						
+				<!-- / site content -->
+				
+			</div>
+			<!-- / site content wrapper -->
 
-        <!-- main cta -->
-        <div id="main-cta">
-          <div id="main-cta-slider" class="nivoSlider">
-            <?php print views_embed_view('homepage_richmedia', 'block'); ?>
-          </div>
-        </div>
-        <!-- / main cta -->
-
-        <div id="dotted-break"></div>
-
-        <!-- site content -->
-        <div id="site-content">
-          <div id="col-left">
-            <div class="add-pad">
-              <section id="homepage-blog-listing">
-                <?php print views_embed_view('blog', 'block_1'); ?>
-              </section>
-            </div>
-          </div>
-          <div id="col-right">
-            <div class="add-pad">
-              <?php if ($title){ ?><h1 class="title" id="page-title"><?php print $title; ?></h1><?php } ?>
-              <?php if ($tabs['#primary']){ ?><div class="tabs"><?php print render($tabs); ?></div><br class="clear-both" /><?php } ?>
-              <?php print $messages; ?>
-              <?php if ($action_links){ ?><ul class="action-links"><?php print render($action_links); ?></ul><?php } ?>
-              <div id="user-content">
-                <?php print render($page['content']); ?>
-              </div>
-            </div>
-          </div>
-          <br class="clear-both" />
-        </div>
-        <!-- / site content -->
-
-      </div>
-      <!-- / site container -->
+			<?php if ($page['footer_3_blocks']): ?>
+			    <div class="footer-three-blocks">
+			        <?php print render($page['footer_3_blocks']); ?>
+			    </div>
+			<?php endif; ?>
+			
+		</div>
+		<!-- / site container -->
 
     </div>
     <!-- / site wrapper -->

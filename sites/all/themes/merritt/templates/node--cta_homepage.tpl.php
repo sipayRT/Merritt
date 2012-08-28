@@ -86,9 +86,11 @@ if(isset($node->field_cta_url[$node->language][0]['attributes']['target'])) {
 else {
   $link_target = '';
 }
-
-print '<a href="' . $node->field_cta_url[$node->language][0]['display_url'] . '" ' . $link_target . ' class="cta_global">';
-  print theme('image_style', array('style_name' => 'cta', 'path' => $node->field_cta_image[$node->language][0]['uri'], 'alt' => $node->title ));
+//___save_debug($node);
+print '<a href="' . $node->field_cta_url[$node->language][0]['display_url'] . '" ' . $link_target . ' class="cta_global_image">';
+print theme('image', array('path' => $node->field_cta_image[$node->language][0]['uri'], 'alt' => $node->title ));
+//print theme_image(array('path' => $node->field_cta_image[$node->language][0]['uri'], 'alt' => $node->title ));
+print  '<span class="cta-text">'.$node->title.'</span>';
 print '</a>';
 
 ?>

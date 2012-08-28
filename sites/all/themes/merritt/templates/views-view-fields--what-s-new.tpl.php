@@ -24,10 +24,10 @@
  */
 ?>
 <?php  
- print $fields['title']->content;
- if ($fields['field_show_video_in_teaser']->content =='<div class="field-content">1</div>'){
-     print $fields['field_video_youtube']->content;
+print '<div class="news-content-title">' . $fields['title']->content . "</div>";
+if ($fields['field_show_video_in_teaser']->content =='<div class="field-content">1</div>'){
+     print '<div class="news-content-video">' . $fields['field_video_youtube']->content . "</div>";
 }
-else  print $fields['body']->content;
- print $fields['view_node']->content;
+else  print '<div class="news-content-body">' . $fields['body']->content . "</div>";
+print '<div class="news-content-read-more">' . $fields['view_node']->content . "</div>";
 ?>

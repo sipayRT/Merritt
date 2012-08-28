@@ -19,17 +19,6 @@ $(function() {
   }
 
   /* -- Default Text For Forms -- */
-  // Newsletter Sign-Up Email Field
-  $("#webform-client-form-21 #edit-submitted-your-e-mail-address, #webform-client-form-21--2 #edit-submitted-your-e-mail-address--2").focus(function(srcc) {
-    if($(this).val() == "Your E-Mail (Required)") {
-      $(this).val("");
-    }
-  });
-  $("#webform-client-form-21 #edit-submitted-your-e-mail-address, #webform-client-form-21--2 #edit-submitted-your-e-mail-address--2").blur(function() {
-    if($(this).val() == "") {
-      $(this).val("Your E-Mail (Required)");
-    }
-  });
 
   // sign up form
   $("#webform-client-form-21 #edit-submitted-name.required").defaultValue("Your Name (Required)");
@@ -38,7 +27,7 @@ $(function() {
   $("#webform-client-form-21--2 #edit-submitted-name--2").defaultValue("Your Name (Required)");
 
   // search form
-  $('#search-block-form .form-text').defaultValue("Enter Keyword...");
+  $('#search-block-form .form-text').defaultValue("Search Site");
 
   /* -- Image Gallery -- */
   if($('#image-gallery-cont').length) {
@@ -270,3 +259,62 @@ jQuery.fn.defaultValue = function(text){
     });
   });
 };
+(function($){
+Drupal.behaviors.custom = { attach: function (context, settings) {
+	//Show/Hide search field
+	$('.search-icon').click(function() {
+		if($(this).parent().find('.search-wrapper').hasClass('show')){
+			$(this).parent().find('.search-wrapper').removeClass("show").slideUp();
+		}else{
+			$(this).parent().find('.search-wrapper').addClass("show").slideDown();
+		}
+		
+	});
+	$('.search-wrapper #edit-submit').val('GO');
+	
+	
+	//Menu "I want to.."
+	
+	$('.region-fixed-menu .block-menu ul.menu li.expanded a').each(function(){
+		$(this).addClass('convolute');
+		$(this).parent().removeClass('expanded');
+		$(this).next().hide();
+	});
+	
+	
+	//Show menu "I want to.."
+	 $(".fixed-menu-button", context).toggle(function(){
+        $(".region-fixed-menu .block-menu").animate({"left": "+=192px"}, "slow");
+        
+		//extanded menu 
+		$('.region-fixed-menu .block-menu ul.menu a.convolute', context).toggle(function(){
+			$(this).toggleClass("convolute"); 
+			$(this).toggleClass("expanded");  
+			$(this).next().slideDown();
+			return false;
+		},function(){
+			$(this).toggleClass("expanded");  
+			$(this).toggleClass("convolute");
+			$(this).next().slideUp();
+			return false;
+		});  
+		$(this).html("close");
+		return false;
+    },function(){
+		  $('.region-fixed-menu .block-menu ul.menu a.expanded', context).each(function(){
+			$(this).addClass('convolute');
+			$(this).removeClass('expanded');
+			$(this).next().slideUp();
+		});  
+        $(".region-fixed-menu .block-menu").animate({"left": "-=192px"}, "slow");
+      //  $(this).toggleClass("active");  $("#block-menu-menu-i-want-to").animate({"width": "-=230px",opacity: "hide"}, "slow");
+		$(this).html("I want to ...");
+		
+		return false;
+    });  
+	
+	
+	
+	
+}};	
+})(jQuery);

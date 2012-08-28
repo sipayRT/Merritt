@@ -86,9 +86,19 @@ if(isset($node->field_cta_url[$node->language][0]['attributes']['target'])) {
 else {
   $link_target = '';
 }
+ if ($node->field_flipbook[$node->language][0]['value'] == 1){
+    print '<a href="' . $node->field_cta_url[$node->language][0]['display_url'] . '" ' . $link_target . ' class="cta_global_image">';
+	print theme('image', array('style_name' => 'cta', 'path' => $node->field_cta_image[$node->language][0]['uri'], 'alt' => $node->title ));
+	print  '<span class="cta-title">'.$node->title.'</span>';
+	print  '<span class="cta-link">'.$node->field_cta_url[$node->language][0]['url'].'</span>';
+	print '</a>';
+}
+else{
+	print '<a href="' . $node->field_cta_url[$node->language][0]['display_url'] . '" ' . $link_target . ' class="cta_global_image">';
+	print theme('image', array('style_name' => 'cta', 'path' => $node->field_cta_image[$node->language][0]['uri'], 'alt' => $node->title ));
+	print  '<span class="cta-text">'.$node->title.'</span>';
+	print '</a>';
+}
 
-print '<a href="' . $node->field_cta_url[$node->language][0]['display_url'] . '" ' . $link_target . ' class="cta_global">';
-print theme('image_style', array('style_name' => 'cta', 'path' => $node->field_cta_image[$node->language][0]['uri'], 'alt' => $node->title ));
-print '</a>';
 
 ?>

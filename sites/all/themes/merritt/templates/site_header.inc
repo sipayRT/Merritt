@@ -11,6 +11,11 @@
                     <?php print render($page['header_menu']); ?>
                 </div>
             <?php endif; ?>
+            <?php if ($page['header_widgets']): ?>
+                <div class="header-widgets">
+                    <?php print render($page['header_widgets']); ?>
+                </div>
+            <?php endif; ?>
 		</div>
 		<br class="clear-both" />
 	</div>
@@ -23,4 +28,14 @@
         <?php endif; ?>
 	</div>
 	<!-- / primary navigation -->
+	<!-- fixed navigation -->
+	<div class="fixed-menu-wrapper">
+        <?php if ($page['fixed_menu']): ?>
+            <div id="fixed-nav-cont">
+                <?php print render($page['fixed_menu']); ?>
+				<div class="fixed-menu-button">I want to...</div>
+            </div>
+        <?php endif; ?>
+	</div>
+	<!-- / fixed navigation -->
 </header>
